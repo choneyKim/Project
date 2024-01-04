@@ -9,9 +9,8 @@ using System.Security.Cryptography.X509Certificates;
 
 
 Player player = new Player();
-ItemList items = new ItemList();
 Shop shop = new Shop(player);
-Scene startScene = new Scene(player, items);
+Scene startScene = new Scene(player, shop);
 
 startScene.MainScene();
 
@@ -20,7 +19,7 @@ public class Scene
 {
     private Player player;
     private Shop shop;
-    private Scene(Player player, ItemList items)
+    public Scene(Player player, Shop shop)
     {
         this.player = player;
         this.shop = shop;
@@ -218,7 +217,7 @@ public class Scene
         Console.WriteLine($"{player.gold} G");
         Console.WriteLine();
         Console.WriteLine("[아이템 목록]");
-        itemNum = Item.DisplayItems();
+        itemNum = shop.DisplayItems();
         Console.WriteLine();
         Console.WriteLine("1. 아이템구매");
         Console.WriteLine("0. 나가기");
@@ -292,28 +291,28 @@ public class Player
 
 
 }
-public class ItemList
-{
-    public List<Item> items = new List<Item>
-        {
-            new Item("무쇠갑옷", 9, "무쇠로 만들어져 튼튼한 갑옷입니다.", 1500),
-            new Item("수련자 갑옷", 5, "수련에 도움을 주는 갑옷입니다.", 1000),
-            new Item("스파르타의 갑옷", 15, "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.", 3000),
-            new Item("낡은 검", 2, "쉽게 볼 수 있는 낡은 검입니다.", 600),
-            new Item("청동 도끼", 5, "어디선가 사용했던 것 같은 도끼입니다.", 1500),
-            new Item("스파르타의 창", 7, "스파르타의 전사들이 사용했다는 전설의 창입니다.", 3000)
-        };
-    public int DisplayItems()
-    {
-        int itemnumber = 0;
-        foreach (var item in items)
-        {
-            Console.WriteLine($"- {item.Name}   | 방어력 +{item.Point}   | {item.Discription}     |  {item.Price} G");
-            itemnumber++;
-        }
-        return itemnumber;
-    }
-}
+//public class ItemList
+//{
+//    public List<Item> items = new List<Item>
+//        {
+//            new Item("무쇠갑옷", 9, "무쇠로 만들어져 튼튼한 갑옷입니다.", 1500),
+//            new Item("수련자 갑옷", 5, "수련에 도움을 주는 갑옷입니다.", 1000),
+//            new Item("스파르타의 갑옷", 15, "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.", 3000),
+//            new Item("낡은 검", 2, "쉽게 볼 수 있는 낡은 검입니다.", 600),
+//            new Item("청동 도끼", 5, "어디선가 사용했던 것 같은 도끼입니다.", 1500),
+//            new Item("스파르타의 창", 7, "스파르타의 전사들이 사용했다는 전설의 창입니다.", 3000)
+//        };
+//    public int DisplayItems()
+//    {
+//        int itemnumber = 0;
+//        foreach (var item in items)
+//        {
+//            Console.WriteLine($"- {item.Name}   | 방어력 +{item.Point}   | {item.Discription}     |  {item.Price} G");
+//            itemnumber++;
+//        }
+//        return itemnumber;
+//    }
+//}
 class Item
 {
     public string Name { get; set; }
@@ -334,7 +333,8 @@ public class Shop
 {
     private Player player;
     private Scene scene;
-    private Shop(Player player)
+    List<Item> playeritems = new List<Item>();
+    public Shop(Player player)
     {
         this.player = player;
     }
