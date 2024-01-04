@@ -6,11 +6,13 @@ using System.Xml.Linq;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
+using static System.Formats.Asn1.AsnWriter;
 
 
 Player player = new Player();
-Shop shop = new Shop(player);
+Shop shop = new Shop();
 Scene startScene = new Scene(player, shop);
+
 
 startScene.MainScene();
 
@@ -24,7 +26,40 @@ public class Scene
         this.player = player;
         this.shop = shop;
     }
+    public void BuyItem(Player player)
+    {
+        
+        bool isInt;
+        int selectNum;
+        bool isselect = false;
+        while (!isselect)
+        {
+            Console.SetCursorPosition(2, 12 + shop.items.Count);
+            string Input = Console.ReadLine();
+            isInt = int.TryParse(Input, out selectNum);
+            if (selectNum == 0)
+            {
+                Console.Clear();
+                isselect = true;
+                MainScene();
+            }
+            else if (player.gold >= shop.items[selectNum - 1].Price)
+            {
+                shop.playeritems.Add(shop.items[selectNum - 1]);
+                player.gold -= shop.items[selectNum - 1].Price;
+                Console.Clear();
+                isselect = true;
+                TradeScene(player);
+                Console.WriteLine($"'{shop.items[selectNum].Name}'를 구매하였습니다.");
 
+            }
+            else
+            {
+                Console.WriteLine("금액이 부족합니다.");
+            }
+
+        }
+    }
     public void MainScene()
     {
         bool isInt;
@@ -241,7 +276,7 @@ public class Scene
                 case 1:
                     Console.Clear();
                     isselect = true;
-                    TradeScene();
+                    TradeScene(player);
                     break;
 
                 default:
@@ -252,7 +287,7 @@ public class Scene
 
 
     }
-    public void TradeScene()
+    public void TradeScene(Player player)
     {
         bool isInt;
         bool isselect = false;
@@ -273,9 +308,9 @@ public class Scene
         Console.WriteLine("원하시는 행동을 입력해주세요.");
         Console.Write(">>");
 
-        shop.BuyItem();
+        BuyItem(player);
     }
-
+    
 
 }
 
@@ -313,7 +348,7 @@ public class Player
 //        return itemnumber;
 //    }
 //}
-class Item
+public class Item
 {
     public string Name { get; set; }
     public int Point { get; set; }
@@ -331,14 +366,9 @@ class Item
 }
 public class Shop
 {
-    private Player player;
-    private Scene scene;
-    List<Item> playeritems = new List<Item>();
-    public Shop(Player player)
-    {
-        this.player = player;
-    }
-    List<Item> items = new List<Item>
+    public List<Item> playeritems = new List<Item>();
+
+    public List<Item> items = new List<Item>
         {
             new Item("무쇠갑옷", 9, "무쇠로 만들어져 튼튼한 갑옷입니다.", 1500),
             new Item("수련자 갑옷", 5, "수련에 도움을 주는 갑옷입니다.", 1000),
@@ -368,37 +398,5 @@ public int DisplayItems2()
         }
         return itemnumber;
     }
-    public void BuyItem()
-    {
-        bool isInt;
-        int selectNum;
-        bool isselect = false;
-        while (!isselect)
-        {
-            Console.SetCursorPosition(2, 12 + items.Count);
-            string Input = Console.ReadLine();
-            isInt = int.TryParse(Input, out selectNum);
-            if (selectNum == 0)
-            {
-                Console.Clear();
-                isselect = true;
-                scene.MainScene();
-            }
-            else if (player.gold >= items[selectNum - 1].Price)
-            {
-                playeritems.Add(items[selectNum - 1]);
-                player.gold -= items[selectNum - 1].Price;
-                Console.Clear();
-                isselect = true;
-                scene.TradeScene();
-                Console.WriteLine($"'{items[selectNum].Name}'를 구매하였습니다.");
-
-            }
-            else
-            {
-                Console.WriteLine("금액이 부족합니다.");
-            }
-
-        }
-    }
+   
 }
