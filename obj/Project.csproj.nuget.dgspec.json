@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\workspace\\2401Work\\240103\\Project\\Project\\Project.csproj": {}
+    "D:\\workspace\\2401Work\\240105\\Project\\Project\\Project.csproj": {}
   },
   "projects": {
-    "D:\\workspace\\2401Work\\240103\\Project\\Project\\Project.csproj": {
+    "D:\\workspace\\2401Work\\240105\\Project\\Project\\Project.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\workspace\\2401Work\\240103\\Project\\Project\\Project.csproj",
+        "projectUniqueName": "D:\\workspace\\2401Work\\240105\\Project\\Project\\Project.csproj",
         "projectName": "Project",
-        "projectPath": "D:\\workspace\\2401Work\\240103\\Project\\Project\\Project.csproj",
+        "projectPath": "D:\\workspace\\2401Work\\240105\\Project\\Project\\Project.csproj",
         "packagesPath": "C:\\Users\\ansru\\.nuget\\packages\\",
-        "outputPath": "D:\\workspace\\2401Work\\240103\\Project\\Project\\obj\\",
+        "outputPath": "D:\\workspace\\2401Work\\240105\\Project\\Project\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ansru\\AppData\\Roaming\\NuGet\\NuGet.Config",

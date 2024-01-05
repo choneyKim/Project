@@ -1,15 +1,4 @@
-﻿
-
-using System.ComponentModel;
-using System.Threading;
-using System.Xml.Linq;
-using System;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using static System.Formats.Asn1.AsnWriter;
-
-
-Player player = new Player();
+﻿Player player = new Player();
 Shop shop = new Shop(player);
 Scene startScene = new Scene(player, shop);
 
@@ -45,7 +34,7 @@ public class Scene
                 isselect = true;
                 MainScene();
             }
-            else if (selectNum > shop.items.Count||selectNum<1)
+            else if (selectNum > shop.items.Count || selectNum < 1)
             {
                 Console.Write("                                                       ");
                 Console.WriteLine("\r잘못된 입력입니다.");
@@ -59,7 +48,7 @@ public class Scene
             else if (player.gold >= shop.items[selectNum - 1].Price && shop.items[selectNum - 1].IsBuy == false)
             {
                 shop.items[selectNum - 1].IsBuy = true;
-                player.playeritems.Add(shop.items[selectNum - 1]);                
+                player.playeritems.Add(shop.items[selectNum - 1]);
                 player.gold -= shop.items[selectNum - 1].Price;
                 Console.SetCursorPosition(0, 5);
                 Console.WriteLine($"{player.gold} G");
@@ -67,7 +56,7 @@ public class Scene
                 shop.DisplayItems2();
                 Console.SetCursorPosition(0, 13 + shop.items.Count);
                 Console.Write("                                                       ");
-                Console.WriteLine($"\r'{shop.items[selectNum-1].Name}'를 구매하였습니다.");
+                Console.WriteLine($"\r'{shop.items[selectNum - 1].Name}'를 구매하였습니다.");
             }
             else
             {
@@ -94,7 +83,7 @@ public class Scene
                 isselect = true;
                 MainScene();
             }
-            else if(player.playeritems.Count == 0)
+            else if (player.playeritems.Count == 0)
             {
                 Console.SetCursorPosition(0, 5);
                 Console.WriteLine($"{player.gold} G");
@@ -104,7 +93,7 @@ public class Scene
                 Console.Write("                                                       ");
                 Console.WriteLine("\r인벤토리가 비어 있습니다.");
             }
-            else if(player.playeritems.Count != 0) 
+            else if (player.playeritems.Count != 0)
             {
                 if (player.playeritems[selectNum - 1].IsBuy == true)
                 {
@@ -135,7 +124,7 @@ public class Scene
                     Console.WriteLine("\r판매가 완료되었습니다.");
                 }
             }
-            
+
         }
     }
     public void EquipItem()
@@ -144,6 +133,7 @@ public class Scene
         bool isselect = false;
         int selectNum;
         int itemNum = player.playeritems.Count;
+
         while (!isselect)
         {
             Console.SetCursorPosition(2, 10 + itemNum);
@@ -155,47 +145,58 @@ public class Scene
                 isselect = true;
                 MainScene();
             }
-            else if (player.playeritems[selectNum - 1].IsEquip == false)
+            else if (selectNum > player.playeritems.Count || selectNum < 1)
             {
-                player.playeritems[selectNum - 1].IsEquip = true;
-                if (player.playeritems[selectNum - 1].Isweapon == true)
-                {
-                    player.attackPoint += player.playeritems[selectNum - 1].Point;
-                    Console.Clear();
-                    isselect = true;
-                    EquipScene();
-                }
-                else
-                {
-                    player.armorPoint += player.playeritems[selectNum - 1].Point;
-                    Console.Clear();
-                    isselect = true;
-                    EquipScene();
-                }
-            }
-            else if (player.playeritems[selectNum - 1].IsEquip == true)
-            {
-                player.playeritems[selectNum - 1].IsEquip = false;
-                if (player.playeritems[selectNum - 1].Isweapon == true)
-                {
-                    player.attackPoint -= player.playeritems[selectNum - 1].Point;
-                    Console.Clear();
-                    isselect = true;
-                    EquipScene();
-                }
-                else
-                {
-                    player.armorPoint -= player.playeritems[selectNum - 1].Point;
-                    Console.Clear();
-                    isselect = true;
-                    EquipScene();
-                }
+                Console.Write("                                                       ");
+                Console.WriteLine("\r잘못된 입력입니다.");
             }
             else
             {
-                Console.WriteLine("잘못된 입력입니다.");
+                foreach (var item in player.playeritems)
+                {
+                    if (item.IsEquip == true)
+                    {
+                        if (item.Isweapon == player.playeritems[selectNum - 1].Isweapon)
+                        {
+                            if (player.playeritems[selectNum - 1].Isweapon == true)
+                            {
+                                item.IsEquip = false;
+                                player.attackPoint -= player.playeritems[selectNum - 1].Point;
+                                Console.SetCursorPosition(0, 6);
+                                itemNum = player.DisplayPlayerItems();
+                            }
+                            else
+                            {
+                                item.IsEquip = false;
+                                player.armorPoint -= player.playeritems[selectNum - 1].Point;
+                                Console.SetCursorPosition(0, 6);
+                                itemNum = player.DisplayPlayerItems();
+                            }
+                        }
+                    }
+                }
+                if (player.playeritems[selectNum - 1].IsEquip == false)
+                {
+                    player.playeritems[selectNum - 1].IsEquip = true;
+                    if (player.playeritems[selectNum - 1].Isweapon == true)
+                    {
+                        player.attackPoint += player.playeritems[selectNum - 1].Point;
+                        Console.SetCursorPosition(0, 6);
+                        itemNum = player.DisplayPlayerItems();
+                    }
+                    else
+                    {
+                        player.armorPoint += player.playeritems[selectNum - 1].Point;
+                        Console.SetCursorPosition(0, 6);
+                        itemNum = player.DisplayPlayerItems();
+                    }
+                }
             }
+            
+            
         }
+
+
     }
     public void MainScene()
     {
@@ -463,14 +464,14 @@ public class Player
     public int attackPoint = 10;
     public int armorPoint = 5;
     public int health = 100;
-    public int gold = 1500;
+    public int gold = 150000;
     public bool[] isEqup = { false, false, false, false, false, false, false, false, false, false, false };
     public bool[] isBuy = { false, false, false, false, false, false, false, false, false, false, false };
 
     public int DisplayPlayerItems()
     {
         int itemnumber = 0;
-        if(playeritems.Count == 0)
+        if (playeritems.Count == 0)
         {
             Console.WriteLine("                                                                                     ");
         }
@@ -479,23 +480,41 @@ public class Player
             foreach (var item in playeritems)
             {
                 if (item.IsEquip == true)
-                {
-                    itemnumber++;
-                    Console.Write("                                                                                     ");
-                    Console.WriteLine($"\r- {itemnumber} [E]{item.Name}   | 방어력 +{item.Point}   | {item.Discription}    ");
+                {   
+                    if(item.Isweapon == true) 
+                    {
+                        itemnumber++;
+                        Console.Write("                                                                                     ");
+                        Console.WriteLine($"\r- {itemnumber} [E]{item.Name}   | 공격력 +{item.Point}   | {item.Discription}    ");
+                    }
+                    else
+                    {
+                        itemnumber++;
+                        Console.Write("                                                                                     ");
+                        Console.WriteLine($"\r- {itemnumber} [E]{item.Name}   | 방어력 +{item.Point}   | {item.Discription}    ");
+                    }
                 }
                 else
                 {
-                    itemnumber++;
-                    Console.Write("                                                                                     ");
-                    Console.WriteLine($"\r- {itemnumber} {item.Name}   | 방어력 +{item.Point}   | {item.Discription}     ");
+                    if (item.Isweapon == true)
+                    {
+                        itemnumber++;
+                        Console.Write("                                                                                     ");
+                        Console.WriteLine($"\r- {itemnumber} {item.Name}   | 공격력 +{item.Point}   | {item.Discription}    ");
+                    }
+                    else
+                    {
+                        itemnumber++;
+                        Console.Write("                                                                                     ");
+                        Console.WriteLine($"\r- {itemnumber} {item.Name}   | 방어력 +{item.Point}   | {item.Discription}    ");
+                    }
                 }
             }
         }
-        
+
         return itemnumber;
     }
-    
+
 
 
 }
@@ -546,13 +565,30 @@ public class Shop
         {
             if (item.IsBuy == false)
             {
-                Console.WriteLine($"- {item.Name}   | 방어력 +{item.Point}   | {item.Discription}     |  {item.Price} G");
-                itemnumber++;
+                if (item.Isweapon == true) 
+                {
+                    Console.WriteLine($"- {item.Name}   | 공격력 +{item.Point}   | {item.Discription}     |  {item.Price} G");
+                    itemnumber++;
+                }
+                else
+                {
+                    Console.WriteLine($"- {item.Name}   | 방어력 +{item.Point}   | {item.Discription}     |  {item.Price} G");
+                    itemnumber++;
+                }
+                    
             }
             else
             {
-                Console.WriteLine($"- {item.Name}   | 방어력 +{item.Point}   | {item.Discription}     |     구매완료");
-                itemnumber++;
+                if (item.Isweapon == true)
+                {
+                    Console.WriteLine($"- {item.Name}   | 공격력 +{item.Point}   | {item.Discription}     |     구매완료");
+                    itemnumber++;
+                }
+                else
+                {
+                    Console.WriteLine($"- {item.Name}   | 방어력 +{item.Point}   | {item.Discription}     |     구매완료");
+                    itemnumber++;
+                }
             }
         }
         return itemnumber;
@@ -564,13 +600,30 @@ public class Shop
         {
             if (item.IsBuy == false)
             {
-                itemnumber++;
-                Console.WriteLine($"- {itemnumber} {item.Name}   | 방어력 +{item.Point}   | {item.Discription}     |  {item.Price} G");
+                if (item.Isweapon == true)
+                {
+                    itemnumber++;
+                    Console.WriteLine($"- {itemnumber} {item.Name}   | 공격력 +{item.Point}   | {item.Discription}     |  {item.Price} G");
+                }
+                else
+                {
+                    itemnumber++;
+                    Console.WriteLine($"- {itemnumber} {item.Name}   | 방어력 +{item.Point}   | {item.Discription}     |  {item.Price} G");
+                }
+
             }
             else
             {
-                itemnumber++;
-                Console.WriteLine($"- {itemnumber} {item.Name}   | 방어력 +{item.Point}   | {item.Discription}     |     구매완료");
+                if (item.Isweapon == true)
+                {
+                    itemnumber++;
+                    Console.WriteLine($"- {itemnumber} {item.Name}   | 공격력 +{item.Point}   | {item.Discription}     |     구매완료");
+                }
+                else
+                {
+                    itemnumber++;
+                    Console.WriteLine($"- {itemnumber} {item.Name}   | 방어력 +{item.Point}   | {item.Discription}     |     구매완료");
+                }
             }
         }
         return itemnumber;
