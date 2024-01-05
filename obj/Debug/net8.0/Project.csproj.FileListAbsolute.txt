@@ -28,3 +28,6 @@ D:\workspace\2401Work\240105\Project\Project\obj\Debug\net8.0\refint\Project.dll
 D:\workspace\2401Work\240105\Project\Project\obj\Debug\net8.0\Project.pdb
 D:\workspace\2401Work\240105\Project\Project\obj\Debug\net8.0\Project.genruntimeconfig.cache
 D:\workspace\2401Work\240105\Project\Project\obj\Debug\net8.0\ref\Project.dll
+D:\workspace\2401Work\240103\Project\Project\bin\Debug\net8.0\Newtonsoft.Json.dll
+D:\workspace\2401Work\240103\Project\Project\obj\Debug\net8.0\Project.csproj.AssemblyReference.cache
+D:\workspace\2401Work\240103\Project\Project\obj\Debug\net8.0\Project.csproj.CopyComplete

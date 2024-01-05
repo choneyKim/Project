@@ -1,4 +1,9 @@
-﻿Player player = new Player(1,"전사",10,5,100,150000);
+﻿using System.IO;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using Newtonsoft.Json;
+
+Player player = new Player(1,"전사",10,5,100,150000);
 Shop shop = new Shop(player);
 Scene startScene = new Scene(player, shop);
 
@@ -12,6 +17,7 @@ public class Scene
     private Shop shop;
     private int damage;
     private int rewards;
+    private int stage;
     private string difficult;
 
     public Scene(Player player, Shop shop)
@@ -77,7 +83,7 @@ public class Scene
         bool isselect = false;
         while (!isselect)
         {
-            Console.SetCursorPosition(2, 13 + player.playeritems.Count);
+            Console.SetCursorPosition(2, 12 + player.playeritems.Count);
             string Input = Console.ReadLine();
             isInt = int.TryParse(Input, out selectNum);
             if (selectNum == 0)
@@ -86,45 +92,66 @@ public class Scene
                 isselect = true;
                 MainScene();
             }
-            else if (player.playeritems.Count == 0)
+            if (selectNum > player.playeritems.Count || selectNum < 1)
             {
-                Console.SetCursorPosition(0, 5);
-                Console.WriteLine($"{player.Gold} G");
-                Console.SetCursorPosition(0, 8);
-                Console.WriteLine(" ");
-                Console.SetCursorPosition(0, 14 + player.playeritems.Count);
                 Console.Write("                                                       ");
-                Console.WriteLine("\r인벤토리가 비어 있습니다.");
+                Console.WriteLine("\r잘못된 입력입니다.");
             }
-            else if (player.playeritems.Count != 0)
+            else
             {
-                if (player.playeritems[selectNum - 1].IsBuy == true)
+                if (player.playeritems.Count == 0)
                 {
-                    foreach (var item in shop.items)
-                    {
-                        if (item.Name == player.playeritems[selectNum - 1].Name)
-                        {
-                            item.IsBuy = false;
-                            sellPrice = item.Price * 0.85f;
-                            player.Gold += (int)sellPrice;
-                        }
-                        else
-                        {
-                            Console.SetCursorPosition(0, 14 + player.playeritems.Count);
-                            Console.Write("                                                       ");
-                            Console.WriteLine("\r보유하지 않은 아이템 입니다.");
-                            Console.SetCursorPosition(0, 15 + player.playeritems.Count);
-                            Console.Write("                                                       ");
-                        }
-                    }
-                    player.playeritems.Remove(player.playeritems[selectNum - 1]);
                     Console.SetCursorPosition(0, 5);
                     Console.WriteLine($"{player.Gold} G");
                     Console.SetCursorPosition(0, 8);
-                    player.DisplayPlayerItems();
+                    Console.WriteLine(" ");
                     Console.SetCursorPosition(0, 14 + player.playeritems.Count);
                     Console.Write("                                                       ");
-                    Console.WriteLine("\r판매가 완료되었습니다.");
+                    Console.WriteLine("\r인벤토리가 비어 있습니다.");
+                }
+                else if (player.playeritems.Count != 0)
+                {
+                    if (player.playeritems[selectNum - 1].IsBuy == true)
+                    {
+                        foreach (var item in shop.items)
+                        {
+                            if (item.Name == player.playeritems[selectNum - 1].Name)
+                            {
+                                item.IsBuy = false;
+                                sellPrice = item.Price * 0.85f;
+                                player.Gold += (int)sellPrice;
+                                player.playeritems.Remove(player.playeritems[selectNum - 1]);
+                            }
+                            else
+                            {
+                                Console.SetCursorPosition(0, 13 + player.playeritems.Count);
+                                Console.Write("                                                       ");
+                                Console.WriteLine("\r보유하지 않은 아이템 입니다.");
+                                Console.SetCursorPosition(0, 15 + player.playeritems.Count);
+                                Console.Write("                                                       ");
+                            }
+                            
+                        }
+                        if (player.playeritems[selectNum - 1].IsEquip = false)
+                        {
+                            Console.SetCursorPosition(0, 5);
+                            Console.WriteLine($"{player.Gold} G");
+                            Console.SetCursorPosition(0, 8);
+                            player.DisplayPlayerItems();
+                            Console.SetCursorPosition(0, 8 + player.playeritems.Count);
+                            Console.Write("                                                                                                                                  ");
+                            Console.SetCursorPosition(0, 13 + player.playeritems.Count);
+                            Console.Write("                                                                                                                                  ");
+                            Console.WriteLine("\r판매가 완료되었습니다.");
+                        }
+                        else
+                        {
+                            Console.SetCursorPosition(0, 13 + player.playeritems.Count);
+                            Console.Write("                                                       ");
+                            Console.WriteLine("\r장착된 아이템은 판매할 수 없습니다.");
+                        }
+
+                    }
                 }
             }
 
@@ -201,20 +228,78 @@ public class Scene
 
 
     }
+    public void Stage()
+    {
+        int armorRequire =0;
+        int defaultRewards =0;
+        switch (stage)
+        {
+            case 1:
+                armorRequire = 7;
+                difficult = "쉬운 던전";
+                defaultRewards = 1000;
+                break;
+            case 2:
+                armorRequire = 11;
+                difficult = "일반 던전";
+                defaultRewards = 1700;
+                break;
+            case 3:
+                armorRequire = 17;
+                difficult = "어려운 던전";
+                defaultRewards = 2500;
+                break;
+        }
+
+            if (player.ArmorPoint < armorRequire)
+            {
+                if (new Random().Next(1, 11) >= 4)
+                {
+                damage = new Random().Next(20 + armorRequire - player.ArmorPoint, 36 + armorRequire - player.ArmorPoint);
+                rewards = defaultRewards * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
+                player.Health -= damage;
+                if (player.IsDead) return;
+                player.Gold += rewards;
+                Console.Clear();
+                ClearScene();
+            }
+                else
+                {
+                    player.Health -= player.Health / 2;
+                    Console.WriteLine("던전 실패.");
+                }
+            }
+            else
+            {
+                damage = new Random().Next(20 + armorRequire - player.ArmorPoint, 36 + armorRequire - player.ArmorPoint);
+                rewards = defaultRewards * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
+                player.Health -= damage;
+                if (player.IsDead) return;
+                player.Gold += rewards;
+                Console.Clear();
+                ClearScene();
+            }
+        
+    }
+
+
     public void MainScene()
     {
         bool isInt;
         int selectNum;
         bool isselect = false;
+        string datainput;
         Console.WriteLine();
         Console.WriteLine("스파르타 마을에 오신 여러분 환영합니다.");
         Console.WriteLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.");
         Console.WriteLine();
-        Console.WriteLine("1. 상태보기");
-        Console.WriteLine("2. 인벤토리");
-        Console.WriteLine("3. 상점");
-        Console.WriteLine("4. 던전입장");
-        Console.WriteLine("5. 휴식하기");
+        Console.WriteLine("\t1. 상태보기");
+        Console.WriteLine("\t2. 인벤토리");
+        Console.WriteLine("\t3. 상점");
+        Console.WriteLine("\t4. 던전입장");
+        Console.WriteLine("\t5. 휴식하기");
+        Console.WriteLine("\t6. 저장하기");
+        Console.WriteLine("\t7. 불러오기");
         Console.WriteLine();
         Console.WriteLine("원하시는 행동을 입력해주세요.");
         Console.Write(">>");
@@ -222,7 +307,7 @@ public class Scene
 
         while (!isselect)
         {
-            Console.SetCursorPosition(2, 11);
+            Console.SetCursorPosition(2, 13);
             string Input = Console.ReadLine();
             isInt = int.TryParse(Input, out selectNum);
             if (selectNum == 1)
@@ -254,6 +339,20 @@ public class Scene
                 Console.Clear();
                 isselect = true;
                 RestScene();
+            }
+            else if (selectNum == 6)
+            {
+                Console.SetCursorPosition(0, 14);
+                Console.WriteLine("저장할 파일명을 입력하세요.");
+                Console.SetCursorPosition(2, 13);
+                player.SaveGameToFile(Console.ReadLine());
+            }
+            else if (selectNum == 7)
+            {
+                Console.SetCursorPosition(0, 14);
+                Console.WriteLine("불러올 파일명을 입력하세요.");
+                Console.SetCursorPosition(2, 13);
+                player.LoadGameFromFile(Console.ReadLine());
             }
             else
             {
@@ -491,108 +590,9 @@ public class Scene
             Console.SetCursorPosition(2, 10);
             string Input = Console.ReadLine();
             isInt = int.TryParse(Input, out selectNum);
-            if (selectNum == 1)
-            {
-                difficult = "쉬운 던전";
-                if (player.ArmorPoint < 5) 
-                {
-                    if(new Random().Next(1, 11) >= 4)
-                    {
-                        damage = new Random().Next(20 + 5 - player.ArmorPoint, 36 + 5 - player.ArmorPoint);
-                        player.Health -= damage;
-                        if (player.IsDead) return;
-                        player.Gold += 1000 * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
-                        Console.Clear();
-                        isselect = true;                       
-                        ClearScene();
-                    }
-                    else
-                    {
-                        player.Health -= player.Health / 2;
-                        Console.WriteLine("던전 실패.");
-                    }
-                }
-                else 
-                {
-                    damage = new Random().Next(20+5-player.ArmorPoint, 36+5 - player.ArmorPoint);
-                    rewards = 1000 * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
-                    player.Health -= damage;
-                    if (player.IsDead) return;
-                    player.Gold += rewards;
-                    Console.Clear();
-                    isselect = true;
-                    ClearScene();
-                }
-            }
-            else if (selectNum == 2)
-            {
-                difficult = "일반 던전";
-                if (player.ArmorPoint < 11)
-                {
-                    if (new Random().Next(1, 11) >= 4)
-                    {
-                        damage = new Random().Next(20 + 11 - player.ArmorPoint, 36 + 11 - player.ArmorPoint);
-                        rewards = 1700 * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
-                        player.Health -= damage;
-                        if (player.IsDead) return;
-                        player.Gold += rewards;
-                        Console.Clear();
-                        isselect = true;
-                        ClearScene();
-                    }
-                    else
-                    {
-                        player.Health -= player.Health / 2;
-                        Console.WriteLine("던전 실패.");
-                    }
-                }
-                else
-                {
-                    damage = new Random().Next(20 + 11 - player.ArmorPoint, 36 + 11 - player.ArmorPoint);
-                    rewards = 1700 * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
-                    player.Health -= damage;
-                    if (player.IsDead) return;
-                    player.Gold += rewards;
-                    Console.Clear();
-                    isselect = true;
-                    ClearScene();
-                }
-            }
-            else if (selectNum == 3)
-            {
-                difficult = "어려운 던전";
-                if (player.ArmorPoint < 17)
-                {
-                    if (new Random().Next(1, 11) >= 4)
-                    {
-                        damage = new Random().Next(20 + 17 - player.ArmorPoint, 36 + 17 - player.ArmorPoint);
-                        rewards = 2500 * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
-                        player.Health -= damage;
-                        if (player.IsDead) return;
-                        player.Gold += rewards;
-                        Console.Clear();
-                        isselect = true;
-                        ClearScene();
-                    }
-                    else
-                    {
-                        player.Health -= player.Health / 2;
-                        Console.WriteLine("던전 실패.");
-                    }
-                }
-                else
-                {
-                    damage = new Random().Next(20 + 17 - player.ArmorPoint, 36 + 17 - player.ArmorPoint);
-                    rewards = 2500 * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
-                    player.Health -= damage;
-                    if (player.IsDead) return;
-                    player.Gold += rewards;
-                    Console.Clear();
-                    isselect = true;
-                    ClearScene();
-                }
-            }
-            else if (selectNum == 0)
+            stage = selectNum;
+            Stage();
+            if (selectNum == 0)
             {
                 Console.Clear();
                 isselect = true;
@@ -775,6 +775,27 @@ public class Player
             Score = 0;
         }
         
+    }
+    public void SaveGameToFile(string fileName)
+    {
+        string serializedData = JsonConvert.SerializeObject(this);
+
+        File.WriteAllText(fileName, serializedData);
+    }
+
+    public void LoadGameFromFile(string fileName)
+    {
+        string savedData = File.ReadAllText(fileName);
+
+        Player loadedGame = JsonConvert.DeserializeObject<Player>(savedData);
+        playeritems = loadedGame.playeritems;
+        Level = loadedGame.Level;
+        Chad = loadedGame.Chad;
+        AttackPoint = loadedGame.AttackPoint;
+        ArmorPoint = loadedGame.ArmorPoint;
+        Health = loadedGame.Health;
+        Gold = loadedGame.Gold;
+        Score = loadedGame.Score;
     }
 
 
