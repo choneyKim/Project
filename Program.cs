@@ -214,6 +214,7 @@ public class Scene
         Console.WriteLine("2. 인벤토리");
         Console.WriteLine("3. 상점");
         Console.WriteLine("4. 던전입장");
+        Console.WriteLine("5. 휴식하기");
         Console.WriteLine();
         Console.WriteLine("원하시는 행동을 입력해주세요.");
         Console.Write(">>");
@@ -221,7 +222,7 @@ public class Scene
 
         while (!isselect)
         {
-            Console.SetCursorPosition(2, 10);
+            Console.SetCursorPosition(2, 11);
             string Input = Console.ReadLine();
             isInt = int.TryParse(Input, out selectNum);
             if (selectNum == 1)
@@ -247,6 +248,12 @@ public class Scene
                 Console.Clear();
                 isselect = true;
                 DungeonScene();
+            }
+            else if (selectNum == 5)
+            {
+                Console.Clear();
+                isselect = true;
+                RestScene();
             }
             else
             {
@@ -496,7 +503,7 @@ public class Scene
                         if (player.IsDead) return;
                         player.Gold += 1000 * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
                         Console.Clear();
-                        isselect = true;
+                        isselect = true;                       
                         ClearScene();
                     }
                     else
@@ -602,6 +609,8 @@ public class Scene
         bool isInt;
         int selectNum;
         bool isselect = false;
+        player.Score++;
+        player.LevelUp();
         Console.WriteLine();
         Console.WriteLine("던전 클리어");
         Console.WriteLine("축하합니다!!");
@@ -634,6 +643,56 @@ public class Scene
             }
         }
     }
+    public void RestScene()
+    {
+        bool isInt;
+        int selectNum;
+        bool isselect = false;
+        Console.WriteLine();
+        Console.WriteLine("휴식하기");
+        Console.WriteLine($"500 G를 내년 체력을 회복할 수 있습니다. (보유 골드 : {player.Gold} G");
+        Console.WriteLine();
+        Console.WriteLine("1. 휴식하기");
+        Console.WriteLine("0. 나가기");
+        Console.WriteLine();
+        Console.WriteLine("원하시는 행동을 입력해주세요.");
+        Console.Write(">>");
+        while (!isselect)
+        {
+            Console.SetCursorPosition(2, 8);
+            string Input = Console.ReadLine();
+            isInt = int.TryParse(Input, out selectNum);
+            switch (selectNum)
+            {
+                case 0:
+                    Console.Clear();
+                    isselect = true;
+                    MainScene();
+                    break;
+                case 1:
+                    if (player.Gold >= 500)
+                    {
+                        player.Gold -= 500;
+                        player.Health = 100;
+                        Console.SetCursorPosition(0, 2);
+                        Console.WriteLine($"500 G를 내년 체력을 회복할 수 있습니다. (보유 골드 : {player.Gold} G");
+                        Console.SetCursorPosition(0, 9);
+                        Console.Write("                                                       ");
+                        Console.WriteLine("\r체력을 회복하였습니다.");
+                    }
+                    else
+                    {
+                        Console.Write("                                                       ");
+                        Console.WriteLine("\r금액이 부족합니다.");
+                    }
+                    break;
+
+                default:
+                    Console.WriteLine("잘못된 입력입니다.");
+                    break;
+            }
+        }
+    }
 
 }
 public class Player
@@ -645,7 +704,10 @@ public class Player
     public int ArmorPoint { get; set; }
     public int Health { get; set; }
     public int Gold { get; set; }
+    public int Score { get; set; }
     public bool IsDead => Health <= 0;
+
+    
 
     public Player(int level, string chad, int attack, int armor, int health, int gold)
     {
@@ -702,6 +764,17 @@ public class Player
         }
 
         return itemnumber;
+    }
+    public void LevelUp()
+    {
+        if (Score == Level) 
+        {
+            Level++;
+            AttackPoint += (Level - 1) / 2;
+            ArmorPoint += (Level - 1);
+            Score = 0;
+        }
+        
     }
 
 
