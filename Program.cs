@@ -83,7 +83,7 @@ public class Scene
         bool isselect = false;
         while (!isselect)
         {
-            Console.SetCursorPosition(2, 12 + player.playeritems.Count);
+            Console.SetCursorPosition(2, 13 + player.playeritems.Count);
             string Input = Console.ReadLine();
             isInt = int.TryParse(Input, out selectNum);
             if (selectNum == 0)
@@ -92,66 +92,47 @@ public class Scene
                 isselect = true;
                 MainScene();
             }
-            if (selectNum > player.playeritems.Count || selectNum < 1)
+            else if (player.playeritems.Count == 0)
             {
+                Console.SetCursorPosition(0, 5);
+                Console.WriteLine($"{player.Gold} G");
+                Console.SetCursorPosition(0, 8);
+                Console.WriteLine(" ");
+                Console.SetCursorPosition(0, 14 + player.playeritems.Count);
                 Console.Write("                                                       ");
-                Console.WriteLine("\r잘못된 입력입니다.");
+                Console.WriteLine("\r인벤토리가 비어 있습니다.");
             }
-            else
+            else if (player.playeritems.Count != 0)
             {
-                if (player.playeritems.Count == 0)
+                if (player.playeritems[selectNum - 1].IsBuy == true)
                 {
-                    Console.SetCursorPosition(0, 5);
-                    Console.WriteLine($"{player.Gold} G");
-                    Console.SetCursorPosition(0, 8);
-                    Console.WriteLine(" ");
-                    Console.SetCursorPosition(0, 14 + player.playeritems.Count);
-                    Console.Write("                                                       ");
-                    Console.WriteLine("\r인벤토리가 비어 있습니다.");
-                }
-                else if (player.playeritems.Count != 0)
-                {
-                    if (player.playeritems[selectNum - 1].IsBuy == true)
+                    foreach (var item in shop.items)
                     {
-                        foreach (var item in shop.items)
+                        if (item.Name == player.playeritems[selectNum - 1].Name)
                         {
-                            if (item.Name == player.playeritems[selectNum - 1].Name)
-                            {
-                                item.IsBuy = false;
-                                sellPrice = item.Price * 0.85f;
-                                player.Gold += (int)sellPrice;
-                                player.playeritems.Remove(player.playeritems[selectNum - 1]);
-                            }
-                            else
-                            {
-                                Console.SetCursorPosition(0, 13 + player.playeritems.Count);
-                                Console.Write("                                                       ");
-                                Console.WriteLine("\r보유하지 않은 아이템 입니다.");
-                                Console.SetCursorPosition(0, 15 + player.playeritems.Count);
-                                Console.Write("                                                       ");
-                            }
-                            
-                        }
-                        if (player.playeritems[selectNum - 1].IsEquip = false)
-                        {
-                            Console.SetCursorPosition(0, 5);
-                            Console.WriteLine($"{player.Gold} G");
-                            Console.SetCursorPosition(0, 8);
-                            player.DisplayPlayerItems();
-                            Console.SetCursorPosition(0, 8 + player.playeritems.Count);
-                            Console.Write("                                                                                                                                  ");
-                            Console.SetCursorPosition(0, 13 + player.playeritems.Count);
-                            Console.Write("                                                                                                                                  ");
-                            Console.WriteLine("\r판매가 완료되었습니다.");
+                            item.IsBuy = false;
+                            sellPrice = item.Price * 0.85f;
+                            player.Gold += (int)sellPrice;
                         }
                         else
                         {
-                            Console.SetCursorPosition(0, 13 + player.playeritems.Count);
+                            Console.SetCursorPosition(0, 14 + player.playeritems.Count);
                             Console.Write("                                                       ");
-                            Console.WriteLine("\r장착된 아이템은 판매할 수 없습니다.");
+                            Console.WriteLine("\r보유하지 않은 아이템 입니다.");
+                            Console.SetCursorPosition(0, 15 + player.playeritems.Count);
+                            Console.Write("                                                       ");
                         }
-
                     }
+                    player.playeritems.Remove(player.playeritems[selectNum - 1]);
+                    Console.SetCursorPosition(0, 5);
+                    Console.WriteLine($"{player.Gold} G");
+                    Console.SetCursorPosition(0, 8);
+                    player.DisplayPlayerItems();
+                    Console.SetCursorPosition(0, 8 + player.playeritems.Count);
+                    Console.Write("                                                                                                          ");
+                    Console.SetCursorPosition(0, 14 + player.playeritems.Count);
+                    Console.Write("                                                                                                          ");
+                    Console.WriteLine("\r판매가 완료되었습니다.");
                 }
             }
 
