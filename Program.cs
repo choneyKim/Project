@@ -535,7 +535,9 @@ public class Shop
             new Item("스파르타의 갑옷", 15, "스파르타의 전사들이 사용했다는 전설의 갑옷입니다.", 3000, false,false,false),
             new Item("낡은 검", 2, "쉽게 볼 수 있는 낡은 검입니다.", 600,true,false,false),
             new Item("청동 도끼", 5, "어디선가 사용했던 것 같은 도끼입니다.", 1500,true, false, false),
-            new Item("스파르타의 창", 7, "스파르타의 전사들이 사용했다는 전설의 창입니다.", 3000,true,false,false)
+            new Item("스파르타의 창", 7, "스파르타의 전사들이 사용했다는 전설의 창입니다.", 3000,true,false,false),
+            new Item("개발자의후드티", 50, "음산한 기운이 느껴집니다.", 10000,false,false,false),
+            new Item("개발자의노트북", 70, "세상을 바꿀 수 있는 전지전능한 힘이 담긴 물건입니다.", 15000,true,false,false)
         };
     public int DisplayItems()
     {
