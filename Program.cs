@@ -1,4 +1,4 @@
-﻿Player player = new Player();
+﻿Player player = new Player(1,"전사",10,5,100,150000);
 Shop shop = new Shop(player);
 Scene startScene = new Scene(player, shop);
 
@@ -10,6 +10,9 @@ public class Scene
 {
     private Player player;
     private Shop shop;
+    private int damage;
+    private int rewards;
+    private string difficult;
 
     public Scene(Player player, Shop shop)
     {
@@ -45,13 +48,13 @@ public class Scene
                 Console.WriteLine("\r이미 구매한 아이템 입니다");
 
             }
-            else if (player.gold >= shop.items[selectNum - 1].Price && shop.items[selectNum - 1].IsBuy == false)
+            else if (player.Gold >= shop.items[selectNum - 1].Price && shop.items[selectNum - 1].IsBuy == false)
             {
                 shop.items[selectNum - 1].IsBuy = true;
                 player.playeritems.Add(shop.items[selectNum - 1]);
-                player.gold -= shop.items[selectNum - 1].Price;
+                player.Gold -= shop.items[selectNum - 1].Price;
                 Console.SetCursorPosition(0, 5);
-                Console.WriteLine($"{player.gold} G");
+                Console.WriteLine($"{player.Gold} G");
                 Console.SetCursorPosition(0, 8);
                 shop.DisplayItems2();
                 Console.SetCursorPosition(0, 13 + shop.items.Count);
@@ -86,7 +89,7 @@ public class Scene
             else if (player.playeritems.Count == 0)
             {
                 Console.SetCursorPosition(0, 5);
-                Console.WriteLine($"{player.gold} G");
+                Console.WriteLine($"{player.Gold} G");
                 Console.SetCursorPosition(0, 8);
                 Console.WriteLine(" ");
                 Console.SetCursorPosition(0, 14 + player.playeritems.Count);
@@ -103,7 +106,7 @@ public class Scene
                         {
                             item.IsBuy = false;
                             sellPrice = item.Price * 0.85f;
-                            player.gold += (int)sellPrice;
+                            player.Gold += (int)sellPrice;
                         }
                         else
                         {
@@ -116,7 +119,7 @@ public class Scene
                     }
                     player.playeritems.Remove(player.playeritems[selectNum - 1]);
                     Console.SetCursorPosition(0, 5);
-                    Console.WriteLine($"{player.gold} G");
+                    Console.WriteLine($"{player.Gold} G");
                     Console.SetCursorPosition(0, 8);
                     player.DisplayPlayerItems();
                     Console.SetCursorPosition(0, 14 + player.playeritems.Count);
@@ -161,14 +164,14 @@ public class Scene
                             if (player.playeritems[selectNum - 1].Isweapon == true)
                             {
                                 item.IsEquip = false;
-                                player.attackPoint -= player.playeritems[selectNum - 1].Point;
+                                player.AttackPoint -= player.playeritems[selectNum - 1].Point;
                                 Console.SetCursorPosition(0, 6);
                                 itemNum = player.DisplayPlayerItems();
                             }
                             else
                             {
                                 item.IsEquip = false;
-                                player.armorPoint -= player.playeritems[selectNum - 1].Point;
+                                player.ArmorPoint -= player.playeritems[selectNum - 1].Point;
                                 Console.SetCursorPosition(0, 6);
                                 itemNum = player.DisplayPlayerItems();
                             }
@@ -180,13 +183,13 @@ public class Scene
                     player.playeritems[selectNum - 1].IsEquip = true;
                     if (player.playeritems[selectNum - 1].Isweapon == true)
                     {
-                        player.attackPoint += player.playeritems[selectNum - 1].Point;
+                        player.AttackPoint += player.playeritems[selectNum - 1].Point;
                         Console.SetCursorPosition(0, 6);
                         itemNum = player.DisplayPlayerItems();
                     }
                     else
                     {
-                        player.armorPoint += player.playeritems[selectNum - 1].Point;
+                        player.ArmorPoint += player.playeritems[selectNum - 1].Point;
                         Console.SetCursorPosition(0, 6);
                         itemNum = player.DisplayPlayerItems();
                     }
@@ -210,6 +213,7 @@ public class Scene
         Console.WriteLine("1. 상태보기");
         Console.WriteLine("2. 인벤토리");
         Console.WriteLine("3. 상점");
+        Console.WriteLine("4. 던전입장");
         Console.WriteLine();
         Console.WriteLine("원하시는 행동을 입력해주세요.");
         Console.Write(">>");
@@ -217,7 +221,7 @@ public class Scene
 
         while (!isselect)
         {
-            Console.SetCursorPosition(2, 9);
+            Console.SetCursorPosition(2, 10);
             string Input = Console.ReadLine();
             isInt = int.TryParse(Input, out selectNum);
             if (selectNum == 1)
@@ -238,6 +242,12 @@ public class Scene
                 isselect = true;
                 ShopScene();
             }
+            else if (selectNum == 4)
+            {
+                Console.Clear();
+                isselect = true;
+                DungeonScene();
+            }
             else
             {
                 Console.WriteLine("잘못된 입력입니다.");
@@ -254,12 +264,12 @@ public class Scene
         Console.WriteLine("상태보기");
         Console.WriteLine("캐릭터의 정보가 표시됩니다.");
         Console.WriteLine();
-        Console.WriteLine($"\tLv. {player.level:D2}");
-        Console.WriteLine($"\tChad ( {player.chad} )");
-        Console.WriteLine($"\t공격력 : {player.attackPoint}");
-        Console.WriteLine($"\t방어력 : {player.armorPoint}");
-        Console.WriteLine($"\t체  력 : {player.health}");
-        Console.WriteLine($"\tGold : {player.gold}");
+        Console.WriteLine($"\tLv. {player.Level:D2}");
+        Console.WriteLine($"\tChad ( {player.Chad} )");
+        Console.WriteLine($"\t공격력 : {player.AttackPoint}");
+        Console.WriteLine($"\t방어력 : {player.ArmorPoint}");
+        Console.WriteLine($"\t체  력 : {player.Health}");
+        Console.WriteLine($"\tGold : {player.Gold}");
         Console.WriteLine();
         Console.WriteLine("0. 나가기");
         Console.WriteLine();
@@ -362,7 +372,7 @@ public class Scene
         Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
         Console.WriteLine();
         Console.WriteLine("[보유 골드]");
-        Console.WriteLine($"{player.gold} G");
+        Console.WriteLine($"{player.Gold} G");
         Console.WriteLine();
         Console.WriteLine("[아이템 목록]");
         itemNum = shop.DisplayItems();
@@ -418,7 +428,7 @@ public class Scene
         Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
         Console.WriteLine();
         Console.WriteLine("[보유 골드]");
-        Console.WriteLine($"{player.gold} G");
+        Console.WriteLine($"{player.Gold} G");
         Console.WriteLine();
         Console.WriteLine("[아이템 목록]");
         itemNum = shop.DisplayItems2();
@@ -441,7 +451,7 @@ public class Scene
         Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
         Console.WriteLine();
         Console.WriteLine("[보유 골드]");
-        Console.WriteLine($"{player.gold} G");
+        Console.WriteLine($"{player.Gold} G");
         Console.WriteLine();
         Console.WriteLine("[아이템 목록]");
         itemNum = player.DisplayPlayerItems();
@@ -453,20 +463,199 @@ public class Scene
 
         SellItem(player);
     }
+    public void DungeonScene()
+    {
+        bool isInt;
+        int selectNum;
+        bool isselect = false;
+        Console.WriteLine();
+        Console.WriteLine("던전 입장");
+        Console.WriteLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.");
+        Console.WriteLine();
+        Console.WriteLine("1. 쉬운 던전\t| 방어력 5이상 권장");
+        Console.WriteLine("2. 일반 던전\t| 방어력 11이상 권장");
+        Console.WriteLine("3. 어려운 던전\t| 방어력 17이상 권장");
+        Console.WriteLine("0. 나가기");
+        Console.WriteLine();
+        Console.WriteLine("원하시는 행동을 입력해주세요.");
+        Console.Write(">>");
+        while (!isselect)
+        {
+            Console.SetCursorPosition(2, 10);
+            string Input = Console.ReadLine();
+            isInt = int.TryParse(Input, out selectNum);
+            if (selectNum == 1)
+            {
+                difficult = "쉬운 던전";
+                if (player.ArmorPoint < 5) 
+                {
+                    if(new Random().Next(1, 11) >= 4)
+                    {
+                        damage = new Random().Next(20 + 5 - player.ArmorPoint, 36 + 5 - player.ArmorPoint);
+                        player.Health -= damage;
+                        if (player.IsDead) return;
+                        player.Gold += 1000 * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
+                        Console.Clear();
+                        isselect = true;
+                        ClearScene();
+                    }
+                    else
+                    {
+                        player.Health -= player.Health / 2;
+                        Console.WriteLine("던전 실패.");
+                    }
+                }
+                else 
+                {
+                    damage = new Random().Next(20+5-player.ArmorPoint, 36+5 - player.ArmorPoint);
+                    rewards = 1000 * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
+                    player.Health -= damage;
+                    if (player.IsDead) return;
+                    player.Gold += rewards;
+                    Console.Clear();
+                    isselect = true;
+                    ClearScene();
+                }
+            }
+            else if (selectNum == 2)
+            {
+                difficult = "일반 던전";
+                if (player.ArmorPoint < 11)
+                {
+                    if (new Random().Next(1, 11) >= 4)
+                    {
+                        damage = new Random().Next(20 + 11 - player.ArmorPoint, 36 + 11 - player.ArmorPoint);
+                        rewards = 1700 * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
+                        player.Health -= damage;
+                        if (player.IsDead) return;
+                        player.Gold += rewards;
+                        Console.Clear();
+                        isselect = true;
+                        ClearScene();
+                    }
+                    else
+                    {
+                        player.Health -= player.Health / 2;
+                        Console.WriteLine("던전 실패.");
+                    }
+                }
+                else
+                {
+                    damage = new Random().Next(20 + 11 - player.ArmorPoint, 36 + 11 - player.ArmorPoint);
+                    rewards = 1700 * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
+                    player.Health -= damage;
+                    if (player.IsDead) return;
+                    player.Gold += rewards;
+                    Console.Clear();
+                    isselect = true;
+                    ClearScene();
+                }
+            }
+            else if (selectNum == 3)
+            {
+                difficult = "어려운 던전";
+                if (player.ArmorPoint < 17)
+                {
+                    if (new Random().Next(1, 11) >= 4)
+                    {
+                        damage = new Random().Next(20 + 17 - player.ArmorPoint, 36 + 17 - player.ArmorPoint);
+                        rewards = 2500 * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
+                        player.Health -= damage;
+                        if (player.IsDead) return;
+                        player.Gold += rewards;
+                        Console.Clear();
+                        isselect = true;
+                        ClearScene();
+                    }
+                    else
+                    {
+                        player.Health -= player.Health / 2;
+                        Console.WriteLine("던전 실패.");
+                    }
+                }
+                else
+                {
+                    damage = new Random().Next(20 + 17 - player.ArmorPoint, 36 + 17 - player.ArmorPoint);
+                    rewards = 2500 * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
+                    player.Health -= damage;
+                    if (player.IsDead) return;
+                    player.Gold += rewards;
+                    Console.Clear();
+                    isselect = true;
+                    ClearScene();
+                }
+            }
+            else if (selectNum == 0)
+            {
+                Console.Clear();
+                isselect = true;
+                MainScene();
+            }
+            else
+            {
+                Console.WriteLine("잘못된 입력입니다.");
+            }
+        }
+    }
+    public void ClearScene()
+    {
+        bool isInt;
+        int selectNum;
+        bool isselect = false;
+        Console.WriteLine();
+        Console.WriteLine("던전 클리어");
+        Console.WriteLine("축하합니다!!");
+        Console.WriteLine($"{difficult}을 클리어 하였습니다");
+        Console.WriteLine();
+        Console.WriteLine("[탐험결과]");
+        Console.WriteLine($"체력 : {player.Health+damage} => {player.Health}");
+        Console.WriteLine($"Gold : {player.Gold-rewards} => {player.Gold}");
+        Console.WriteLine();
+        Console.WriteLine("0. 나가기");
+        Console.WriteLine();
+        Console.WriteLine("원하시는 행동을 입력해주세요.");
+        Console.Write(">>");
+        while (!isselect)
+        {
+            Console.SetCursorPosition(2, 12);
+            string Input = Console.ReadLine();
+            isInt = int.TryParse(Input, out selectNum);
+            switch (selectNum)
+            {
+                case 0:
+                    Console.Clear();
+                    isselect = true;
+                    MainScene();
+                    break;
+
+                default:
+                    Console.WriteLine("잘못된 입력입니다.");
+                    break;
+            }
+        }
+    }
 
 }
 public class Player
 {
     public List<Item> playeritems = new List<Item>();
+    public int Level { get; set; }
+    public string Chad { get; set; }
+    public int AttackPoint { get; set; }
+    public int ArmorPoint { get; set; }
+    public int Health { get; set; }
+    public int Gold { get; set; }
+    public bool IsDead => Health <= 0;
 
-    public int level = 1;
-    public string chad = "전사";
-    public int attackPoint = 10;
-    public int armorPoint = 5;
-    public int health = 100;
-    public int gold = 150000;
-    public bool[] isEqup = { false, false, false, false, false, false, false, false, false, false, false };
-    public bool[] isBuy = { false, false, false, false, false, false, false, false, false, false, false };
+    public Player(int level, string chad, int attack, int armor, int health, int gold)
+    {
+        Level = level;
+        Chad = chad;
+        AttackPoint = attack;
+        ArmorPoint = armor;
+        Health = health;
+        Gold = gold;
+    }
 
     public int DisplayPlayerItems()
     {
