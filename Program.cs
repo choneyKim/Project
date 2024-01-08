@@ -3,12 +3,14 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Newtonsoft.Json;
 
-Player player = new Player(1,"전사",10,5,100,150000);
+Player player = new Player(1, "전사", 10, 5, 100, 150000);
 Shop shop = new Shop(player);
 Scene startScene = new Scene(player, shop);
 
-
+startScene.StartLogo();
 startScene.MainScene();
+
+
 
 
 public class Scene
@@ -111,51 +113,56 @@ public class Scene
                 }
                 else
                 {
-                    if (player.playeritems[selectNum - 1].IsBuy == true)
+                    for (int i = 0; i < player.playeritems.Count; i++)
                     {
-                        foreach (var item in shop.items)
+                        if (player.playeritems[i] == player.playeritems[selectNum - 1])
                         {
-                            if (item.Name == player.playeritems[selectNum - 1].Name)
+                            if (player.playeritems[selectNum - 1].IsEquip == false)
                             {
-                                if (item.IsEquip == false)
-                                {
-                                    item.IsBuy = false;
-                                    sellPrice = item.Price * 0.85f;
-                                    player.Gold += (int)sellPrice;
-                                }                               
+                                shop.items.Find(x => x.Name == player.playeritems[selectNum - 1].Name).IsBuy = false;
+                                sellPrice = shop.items.Find(x => x.Name == player.playeritems[selectNum - 1].Name).Price * 0.85f;
+                                player.Gold += (int)sellPrice;
+                                player.playeritems.Remove(player.playeritems[selectNum - 1]);
+                                Console.SetCursorPosition(0, 5);
+                                Console.WriteLine($"{player.Gold} G");
+                                Console.SetCursorPosition(0, 8);
+                                player.DisplayPlayerItems();
+                                Console.SetCursorPosition(0, 8 + player.playeritems.Count);
+                                Console.Write("                                                                                                                       ");
+                                Console.SetCursorPosition(0, 27);
+                                Console.Write("                                                                                                                       ");
+                                Console.WriteLine("\r판매가 완료되었습니다.");
                             }
                             else
                             {
-                                Console.SetCursorPosition(0, 27);
-                                Console.Write("                                                       ");
-                                Console.WriteLine("\r보유하지 않은 아이템 입니다.");
+                                if (player.playeritems[selectNum - 1].Isweapon == true)
+                                {
+                                    player.playeritems[selectNum - 1].IsEquip = false;
+                                    player.AttackPoint -= player.playeritems[selectNum - 1].Point;
+                                    Console.SetCursorPosition(0, 8);
+                                    player.DisplayPlayerItems();
+                                    Console.SetCursorPosition(0, 8 + player.playeritems.Count);
+                                    Console.SetCursorPosition(0, 27);
+                                    Console.Write("                                                                                                                       ");
+                                    Console.WriteLine("\r장착을 해제하였습니다.");
+                                }
+                                else
+                                {
+                                    player.playeritems[selectNum - 1].IsEquip = false;
+                                    player.ArmorPoint -= player.playeritems[selectNum - 1].Point;
+                                    Console.SetCursorPosition(0, 8);
+                                    player.DisplayPlayerItems();
+                                    Console.SetCursorPosition(0, 8 + player.playeritems.Count);
+                                    Console.SetCursorPosition(0, 27);
+                                    Console.Write("                                                                                                                       ");
+                                    Console.WriteLine("\r장착을 해제하였습니다.");
+                                }
                             }
                         }
-                        if (player.playeritems[selectNum-1].IsEquip == false)
-                        {
-                            player.playeritems.Remove(player.playeritems[selectNum - 1]);
-                            Console.SetCursorPosition(0, 5);
-                            Console.WriteLine($"{player.Gold} G");
-                            Console.SetCursorPosition(0, 8);
-                            player.DisplayPlayerItems();
-                            Console.SetCursorPosition(0, 8 + player.playeritems.Count);
-                            Console.Write("                                                                                                                       ");
-                            Console.SetCursorPosition(0, 27);
-                            Console.Write("                                                                                                                       ");
-                            Console.WriteLine("\r판매가 완료되었습니다.");
-                        }
-                        else
-                        {
-                            Console.SetCursorPosition(0, 27);
-                            Console.Write("                                                                  ");
-                            Console.WriteLine("\r장착을 해제하여 주십시오");
-                        }
-                        
                     }
-                }
-                
-            }
 
+                }
+            }
         }
     }
     public void EquipItem()
@@ -187,21 +194,24 @@ public class Scene
                 {
                     if (item.IsEquip == true)
                     {
-                        if (item.Isweapon == player.playeritems[selectNum - 1].Isweapon)
+                        if (item.Name != player.playeritems[selectNum - 1].Name)
                         {
-                            if (player.playeritems[selectNum - 1].Isweapon == true)
+                            if (item.Isweapon == player.playeritems[selectNum - 1].Isweapon)
                             {
-                                item.IsEquip = false;
-                                player.AttackPoint -= player.playeritems[selectNum - 1].Point;
-                                Console.SetCursorPosition(0, 6);
-                                itemNum = player.DisplayPlayerItems();
-                            }
-                            else
-                            {
-                                item.IsEquip = false;
-                                player.ArmorPoint -= player.playeritems[selectNum - 1].Point;
-                                Console.SetCursorPosition(0, 6);
-                                itemNum = player.DisplayPlayerItems();
+                                if (player.playeritems[selectNum - 1].Isweapon == true)
+                                {
+                                    item.IsEquip = false;
+                                    player.AttackPoint -= player.playeritems[selectNum - 1].Point;
+                                    Console.SetCursorPosition(0, 6);
+                                    itemNum = player.DisplayPlayerItems();
+                                }
+                                else
+                                {
+                                    item.IsEquip = false;
+                                    player.ArmorPoint -= player.playeritems[selectNum - 1].Point;
+                                    Console.SetCursorPosition(0, 6);
+                                    itemNum = player.DisplayPlayerItems();
+                                }
                             }
                         }
                     }
@@ -222,17 +232,33 @@ public class Scene
                         itemNum = player.DisplayPlayerItems();
                     }
                 }
+                else
+                {
+                    player.playeritems[selectNum - 1].IsEquip = false;
+                    if (player.playeritems[selectNum - 1].Isweapon == true)
+                    {
+                        player.AttackPoint -= player.playeritems[selectNum - 1].Point;
+                        Console.SetCursorPosition(0, 6);
+                        itemNum = player.DisplayPlayerItems();
+                    }
+                    else
+                    {
+                        player.ArmorPoint -= player.playeritems[selectNum - 1].Point;
+                        Console.SetCursorPosition(0, 6);
+                        itemNum = player.DisplayPlayerItems();
+                    }
+                }
             }
-            
-            
+
+
         }
 
 
     }
     public void Stage()
     {
-        int armorRequire =0;
-        int defaultRewards =0;
+        int armorRequire = 0;
+        int defaultRewards = 0;
         switch (stage)
         {
             case 1:
@@ -252,10 +278,10 @@ public class Scene
                 break;
         }
 
-            if (player.ArmorPoint < armorRequire)
+        if (player.ArmorPoint < armorRequire)
+        {
+            if (new Random().Next(1, 11) >= 4)
             {
-                if (new Random().Next(1, 11) >= 4)
-                {
                 damage = new Random().Next(20 + armorRequire - player.ArmorPoint, 36 + armorRequire - player.ArmorPoint);
                 rewards = defaultRewards * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
                 player.Health -= damage;
@@ -263,29 +289,67 @@ public class Scene
                 player.Gold += rewards;
                 Console.Clear();
                 ClearScene();
-            }
-                else
-                {
-                    player.Health -= player.Health / 2;
-                    Console.WriteLine("던전 실패.");
-                }
             }
             else
             {
-                damage = new Random().Next(20 + armorRequire - player.ArmorPoint, 36 + armorRequire - player.ArmorPoint);
-                rewards = defaultRewards * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
-                player.Health -= damage;
-                if (player.IsDead) return;
-                player.Gold += rewards;
-                Console.Clear();
-                ClearScene();
+                player.Health -= player.Health / 2;
+                Console.WriteLine("던전 실패.");
             }
-        
+        }
+        else
+        {
+            damage = new Random().Next(20 + armorRequire - player.ArmorPoint, 36 + armorRequire - player.ArmorPoint);
+            rewards = defaultRewards * (100 + (new Random().Next(player.AttackPoint, player.AttackPoint * 2 + 1))) / 100;
+            player.Health -= damage;
+            if (player.IsDead) return;
+            player.Gold += rewards;
+            Console.Clear();
+            ClearScene();
+        }
+
+    }
+    public void Title(string text)
+    {
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine(text);
+        Console.ResetColor();
+    }
+    public void Highlight(string s1, string s2, string s3 = "")
+    {
+        Console.Write(s1);
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.Write(s2);
+        Console.ResetColor();
+        Console.WriteLine(s3);
     }
 
-
+    public void StartLogo()
+    {
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine("                                    __                 ");
+        Console.WriteLine("      ____________ _____  _______ _/  |_ _____         ");
+        Console.WriteLine("     /  ___/\\____ \\\\__  \\ \\_  __ \\\\   __\\\\__  \\        ");
+        Console.WriteLine("     \\___ \\ |  |_> >/ __ \\_|  | \\/ |  |   / __ \\_      ");
+        Console.WriteLine("    /____  >|   __/(____  /|__|    |__|  (____  /      ");
+        Console.WriteLine("         \\/ |__|        \\/                    \\/       ");
+        Console.WriteLine("");
+        Console.WriteLine("    .___                 ____                          ");
+        Console.WriteLine("  __| _/__ __   ____    / ___\\   ____   ____    ____   ");
+        Console.WriteLine(" / __ ||  |  \\ /    \\  / /_/  >_/ __ \\ /  _ \\  /    \\  ");
+        Console.WriteLine("/ /_/ ||  |  /|   |  \\ \\___  / \\  ___/(  <_> )|   |  \\ ");
+        Console.WriteLine("\\____ ||____/ |___|  //_____/   \\___  >\\____/ |___|  / ");
+        Console.WriteLine("     \\/            \\/               \\/             \\/  ");
+        Console.WriteLine("");
+        Console.WriteLine("");
+        Console.WriteLine("===============================================================");
+        Console.WriteLine("                P R E S S     A N Y    K E Y                   ");
+        Console.WriteLine("===============================================================");
+        Console.ReadKey();
+    }
     public void MainScene()
     {
+        Console.Clear();
         bool isInt;
         int selectNum;
         bool isselect = false;
@@ -296,7 +360,7 @@ public class Scene
         Console.WriteLine();
         Console.WriteLine("\t1. 상태보기");
         Console.WriteLine("\t2. 인벤토리");
-        Console.WriteLine("\t3. 상점");
+        Console.WriteLine("\t3. 상    점");
         Console.WriteLine("\t4. 던전입장");
         Console.WriteLine("\t5. 휴식하기");
         Console.WriteLine("\t6. 저장하기");
@@ -368,15 +432,15 @@ public class Scene
         bool isselect = false;
         int selectNum;
         Console.WriteLine();
-        Console.WriteLine("상태보기");
+        Title("< 상태보기 >");
         Console.WriteLine("캐릭터의 정보가 표시됩니다.");
         Console.WriteLine();
-        Console.WriteLine($"\tLv. {player.Level:D2}");
-        Console.WriteLine($"\tChad ( {player.Chad} )");
-        Console.WriteLine($"\t공격력 : {player.AttackPoint}");
-        Console.WriteLine($"\t방어력 : {player.ArmorPoint}");
-        Console.WriteLine($"\t체  력 : {player.Health}");
-        Console.WriteLine($"\tGold : {player.Gold}");
+        Highlight("\tLv. ", player.Level.ToString("00"));
+        Highlight("\tChad. (", player.Chad.ToString(), ")");
+        Highlight("\t공격력 : ", player.AttackPoint.ToString());
+        Highlight("\t방어력 : ", player.ArmorPoint.ToString());
+        Highlight("\t체력 : ", player.Health.ToString());
+        Highlight("\tGold : ", player.Gold.ToString());
         Console.WriteLine();
         Console.WriteLine("0. 나가기");
         Console.WriteLine();
@@ -411,7 +475,7 @@ public class Scene
         int selectNum;
         int itemNum;
         Console.WriteLine();
-        Console.WriteLine("인벤토리");
+        Title("< 인벤토리 >");
         Console.WriteLine("보유 중인 아이템을 관리할 수 있습니다.");
         Console.WriteLine();
         Console.WriteLine("[아이템 목록]");
@@ -454,7 +518,7 @@ public class Scene
     {
         int itemNum;
         Console.WriteLine();
-        Console.WriteLine("인벤토리 - 장착 관리");
+        Title("< 인벤토리 - 장착 관리 >");
         Console.WriteLine("보유 중인 아이템을 관리할 수 있습니다.");
         Console.WriteLine();
         Console.WriteLine("[아이템 목록]");
@@ -475,11 +539,11 @@ public class Scene
         int selectNum;
         int itemNum;
         Console.WriteLine();
-        Console.WriteLine("상점");
+        Title("< 상    점 >");
         Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
         Console.WriteLine();
         Console.WriteLine("[보유 골드]");
-        Console.WriteLine($"{player.Gold} G");
+        Highlight("", player.Gold.ToString(), "G");
         Console.WriteLine();
         Console.WriteLine("[아이템 목록]");
         itemNum = shop.DisplayItems();
@@ -531,11 +595,11 @@ public class Scene
         int selectNum;
         int itemNum;
         Console.WriteLine();
-        Console.WriteLine("상점 - 아이템 구매");
+        Title("< 상    점 - 아이템 구매 >");
         Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
         Console.WriteLine();
         Console.WriteLine("[보유 골드]");
-        Console.WriteLine($"{player.Gold} G");
+        Highlight("", player.Gold.ToString(), "G");
         Console.WriteLine();
         Console.WriteLine("[아이템 목록]");
         itemNum = shop.DisplayItems2();
@@ -554,11 +618,11 @@ public class Scene
         int selectNum;
         int itemNum;
         Console.WriteLine();
-        Console.WriteLine("상점 - 아이템 판매");
+        Title("< 상    점 - 아이템 판매 >");
         Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
         Console.WriteLine();
         Console.WriteLine("[보유 골드]");
-        Console.WriteLine($"{player.Gold} G");
+        Highlight("", player.Gold.ToString(), "G");
         Console.WriteLine();
         Console.WriteLine("[아이템 목록]");
         itemNum = player.DisplayPlayerItems();
@@ -577,7 +641,7 @@ public class Scene
         int selectNum;
         bool isselect = false;
         Console.WriteLine();
-        Console.WriteLine("던전 입장");
+        Title("< 던전 입장 >");
         Console.WriteLine("이곳에서 던전으로 들어가기전 활동을 할 수 있습니다.");
         Console.WriteLine();
         Console.WriteLine("1. 쉬운 던전\t| 방어력 5이상 권장");
@@ -614,13 +678,13 @@ public class Scene
         player.Score++;
         player.LevelUp();
         Console.WriteLine();
-        Console.WriteLine("던전 클리어");
+        Title("< 던전 클리어! >");
         Console.WriteLine("축하합니다!!");
         Console.WriteLine($"{difficult}을 클리어 하였습니다");
         Console.WriteLine();
         Console.WriteLine("[탐험결과]");
-        Console.WriteLine($"체력 : {player.Health+damage} => {player.Health}");
-        Console.WriteLine($"Gold : {player.Gold-rewards} => {player.Gold}");
+        Console.WriteLine($"체력 : {player.Health + damage} => {player.Health}");
+        Console.WriteLine($"Gold : {player.Gold - rewards} => {player.Gold}");
         Console.WriteLine();
         Console.WriteLine("0. 나가기");
         Console.WriteLine();
@@ -651,8 +715,8 @@ public class Scene
         int selectNum;
         bool isselect = false;
         Console.WriteLine();
-        Console.WriteLine("휴식하기");
-        Console.WriteLine($"500 G를 내년 체력을 회복할 수 있습니다. (보유 골드 : {player.Gold} G");
+        Title("< 휴식하기 >");
+        Console.WriteLine($"500 G를 내면 체력을 회복할 수 있습니다. (보유 골드 : {player.Gold} G");
         Console.WriteLine();
         Console.WriteLine("1. 휴식하기");
         Console.WriteLine("0. 나가기");
@@ -709,7 +773,8 @@ public class Player
     public int Score { get; set; }
     public bool IsDead => Health <= 0;
 
-    
+
+
 
     public Player(int level, string chad, int attack, int armor, int health, int gold)
     {
@@ -733,18 +798,26 @@ public class Player
             foreach (var item in playeritems)
             {
                 if (item.IsEquip == true)
-                {   
-                    if(item.Isweapon == true) 
+                {
+                    if (item.Isweapon == true)
                     {
                         itemnumber++;
                         Console.Write("                                                                                     ");
-                        Console.WriteLine($"\r- {itemnumber} [E]{item.Name}   | 공격력 +{item.Point}   | {item.Discription}    ");
+                        Console.Write($"\r- {itemnumber} [");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write("E");
+                        Console.ResetColor();
+                        Console.WriteLine($"]{item.Name}   | 공격력 +{item.Point}   | {item.Discription}    ");
                     }
                     else
                     {
                         itemnumber++;
                         Console.Write("                                                                                     ");
-                        Console.WriteLine($"\r- {itemnumber} [E]{item.Name}   | 방어력 +{item.Point}   | {item.Discription}    ");
+                        Console.Write($"\r- {itemnumber} [");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write("E");
+                        Console.ResetColor();
+                        Console.WriteLine($"]{item.Name}   | 방어력 +{item.Point}   | {item.Discription}    ");
                     }
                 }
                 else
@@ -753,6 +826,7 @@ public class Player
                     {
                         itemnumber++;
                         Console.Write("                                                                                     ");
+                        Console.ResetColor();
                         Console.WriteLine($"\r- {itemnumber} {item.Name}   | 공격력 +{item.Point}   | {item.Discription}    ");
                     }
                     else
@@ -769,14 +843,14 @@ public class Player
     }
     public void LevelUp()
     {
-        if (Score == Level) 
+        if (Score == Level)
         {
             Level++;
             AttackPoint += (Level - 1) / 2;
             ArmorPoint += (Level - 1);
             Score = 0;
         }
-        
+
     }
     public void SaveGameToFile(string fileName)
     {
@@ -784,7 +858,6 @@ public class Player
 
         File.WriteAllText(fileName, serializedData);
     }
-
     public void LoadGameFromFile(string fileName)
     {
         string savedData = File.ReadAllText(fileName);
@@ -850,7 +923,7 @@ public class Shop
         {
             if (item.IsBuy == false)
             {
-                if (item.Isweapon == true) 
+                if (item.Isweapon == true)
                 {
                     Console.WriteLine($"- {item.Name}   | 공격력 +{item.Point}   | {item.Discription}     |  {item.Price} G");
                     itemnumber++;
@@ -860,7 +933,7 @@ public class Shop
                     Console.WriteLine($"- {item.Name}   | 방어력 +{item.Point}   | {item.Discription}     |  {item.Price} G");
                     itemnumber++;
                 }
-                    
+
             }
             else
             {
